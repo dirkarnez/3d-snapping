@@ -1,0 +1,50 @@
+var createScene = function () {
+    var scene = new BABYLON.Scene(engine);
+    scene.clearColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+
+    // camera
+    var camera = new BABYLON.ArcRotateCamera("camera1", -Math.PI/2, Math.PI/4, 80, new BABYLON.Vector3(0, 0, 0), scene);
+    camera.attachControl(canvas, true);
+    // lights
+    var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(1, 0.5, 0), scene);
+    light.intensity = 0.8;
+
+
+    var faceColors = [];
+    faceColors[0] = BABYLON.Color3.Blue();
+    faceColors[1] = BABYLON.Color3.Red();
+    faceColors[2] = BABYLON.Color3.Green();
+    faceColors[3] = BABYLON.Color3.White();
+    faceColors[4] = BABYLON.Color3.Yellow();
+    faceColors[5] = BABYLON.Color3.Black();
+
+    var disc = BABYLON.MeshBuilder.CreateCylinder("disc", { diameter:20, height:0.25 }, scene);
+    disc.material = new BABYLON.StandardMaterial("grass", scene);
+    disc.material.diffuseTexture = new BABYLON.Texture("textures/grass.png", scene);
+    
+    var box = [];
+    for(var i=0; i<5; i++) {
+        box[i] = BABYLON.MeshBuilder.CreateBox("Box"+i, { faceColors: faceColors }, scene);
+        var scale = 1 + Math.random()*Math.random()*2;
+        var radius = Math.random()*9;
+        var theta = Math.random() * 2 * Math.PI;
+        var phi = Math.random() * 2 * Math.PI; 
+        box[i].scaling.y = scale;
+        box[i].rotation.y = phi;
+        box[i].position = new BABYLON.Vector3(radius * Math.cos(theta), scale/2, radius * Math.sin(theta));
+        box[i].parent = disc;
+    }
+
+    
+    var phi = 0;
+    scene.registerAfterRender(function () {
+        matrix = disc.getWorldMatrix();
+        disc.rotate(BABYLON.Axis.Y, Math.PI / 150, BABYLON.Space.LOCAL);
+        disc.rotate(BABYLON.Axis.Z, Math.PI / 200, BABYLON.Space.LOCAL);
+        disc.position = new BABYLON.Vector3(15 * Math.cos(phi), 16 * Math.sin(phi), 5)
+        phi +=0.01;
+
+    })
+
+    return scene;
+};
